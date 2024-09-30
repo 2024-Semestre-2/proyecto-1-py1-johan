@@ -1,0 +1,2 @@
+memoria, 512, kb
+virtual, 64, kb
