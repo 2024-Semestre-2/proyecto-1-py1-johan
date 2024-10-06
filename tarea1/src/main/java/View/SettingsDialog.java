@@ -2,52 +2,70 @@ package View;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 public class SettingsDialog extends JDialog {
-    private JSpinner osSizeSpinner;
-    private JSpinner userSizeSpinner;
+    private JSpinner memorySizeSpinner;
     private JButton saveButton;
+    private JButton cancelButton;
+    private boolean isMemoryConfigurable;
 
-    public SettingsDialog(JFrame parent) {
-        super(parent, "Settings", true);
-        setLayout(new GridLayout(3, 2, 10, 10));
-
-        osSizeSpinner = new JSpinner(new SpinnerNumberModel(1024, 512, 8192, 128)); // Ejemplo: de 512MB a 8GB
-        userSizeSpinner = new JSpinner(new SpinnerNumberModel(1024, 512, 8192, 128)); // Ejemplo: de 512MB a 8GB
+    public SettingsDialog(JFrame parent, int currentMemorySize, boolean canConfigureMemory) {
+        super(parent, "Memory Settings", true);
+        this.isMemoryConfigurable = canConfigureMemory;
+        
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        
+        // Memory size spinner
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        add(new JLabel("Memory Size (KB):"), gbc);
+        
+        memorySizeSpinner = new JSpinner(new SpinnerNumberModel(currentMemorySize, 256, 8192, 256));
+        memorySizeSpinner.setEnabled(isMemoryConfigurable);
+        gbc.gridx = 1;
+        add(memorySizeSpinner, gbc);
+        
+        // Message when memory is not configurable
+        if (!isMemoryConfigurable) {
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            gbc.gridwidth = 2;
+            add(new JLabel("Memory can only be configured when no files are loaded."), gbc);
+        }
+        
+        // Buttons panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         saveButton = new JButton("Save");
-
-        add(new JLabel("OS Size (MB):"));
-        add(osSizeSpinner);
-        add(new JLabel("User Size (MB):"));
-        add(userSizeSpinner);
-        add(saveButton);
-
+        cancelButton = new JButton("Cancel");
+        
+        buttonPanel.add(saveButton);
+        buttonPanel.add(cancelButton);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        add(buttonPanel, gbc);
+        
+        // Default button actions
+        saveButton.addActionListener(e -> dispose());
+        cancelButton.addActionListener(e -> dispose());
+        
         pack();
         setLocationRelativeTo(parent);
-
-        saveButton.addActionListener(e -> {
-            saveSettings();
-            setVisible(false); // Cierra el diálogo después de guardar
-        });
     }
-
-    private void saveSettings() {
-        int osSize = (int) osSizeSpinner.getValue();
-        int userSize = (int) userSizeSpinner.getValue();
-
-        // Aquí puedes guardar las configuraciones, por ejemplo, en un archivo de configuración o en variables globales
-        System.out.println("OS Size: " + osSize + " MB");
-        System.out.println("User Size: " + userSize + " MB");
-
-        // También puedes invocar métodos en el controlador para aplicar estas configuraciones
+    
+    public void addSaveListener(ActionListener listener) {
+        // Remove any existing listeners
+        for (ActionListener al : saveButton.getActionListeners()) {
+            saveButton.removeActionListener(al);
+        }
+        saveButton.addActionListener(listener);
     }
-
-    public int getOsSize() {
-        return (int) osSizeSpinner.getValue();
-    }
-
-    public int getUserSize() {
-        return (int) userSizeSpinner.getValue();
+    
+    public int getMemorySize() {
+        return (int) memorySizeSpinner.getValue();
     }
 }
-

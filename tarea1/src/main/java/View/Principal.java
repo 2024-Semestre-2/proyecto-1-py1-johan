@@ -4,11 +4,6 @@ import Model.BCP;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
-
 /**
  *
  * @author johan
@@ -26,6 +21,8 @@ public class Principal extends javax.swing.JFrame {
     
     private JTable diskTable;
     private DefaultTableModel diskTableModel;
+    
+    private ConsolePanel consolePanel;
     /**
      * Creates new form Principal
      */
@@ -35,6 +32,14 @@ public class Principal extends javax.swing.JFrame {
         bcpFrame();
         MemoryFrame();
         DiskFrame();
+        setupConsolePanel();
+    }
+    
+    private void setupConsolePanel() {
+        consolePanel = new ConsolePanel();
+        JScrollPane consoleScrollPane = new JScrollPane(consolePanel);
+        consoleScrollPane.setBounds(350, 320, 300, 140); // Ajusta estos valores según necesites
+        add(consoleScrollPane);
     }
     
     private void process(){
@@ -59,26 +64,23 @@ public class Principal extends javax.swing.JFrame {
         setVisible(true);
     }
     
+    public ConsolePanel getConsolePanel() {
+        return consolePanel;
+    }
+    
     private void bcpFrame(){
-        String[] columnNames = {"BCP actual CPU" + processCounter};
-        bcpTableModel = new DefaultTableModel(columnNames, 0);
-        //bcpTable = new JTable(bcpTableModel);
-        
-        bcpTable = new JTable(bcpTableModel) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                // No permitir edición en la tabla
-                return false; 
-            }
-        };
-        
+        bcpTableModel = new DefaultTableModel(
+            new Object[][] {},
+            new String[] {"Property", "Value"}
+        );
+        bcpTable = new JTable(bcpTableModel);
         JScrollPane scrollPane = new JScrollPane(bcpTable);
-        scrollPane.setBounds(350, 60, 300, 200);
+        
+        //JScrollPane scrollPane = new JScrollPane(bcpTable);
+        scrollPane.setBounds(350, 60, 300, 250);
         add(scrollPane);
         
         // Otros componentes de la ventana...
-        setSize(400, 300);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
     }
     
@@ -295,6 +297,14 @@ public class Principal extends javax.swing.JFrame {
         tableModel.addRow(new Object[]{processCounter + " - " + name, state}); // Agregar el proceso con nombre y estado
         processCounter++; // Incrementar el contador
     }
+    
+    public void addMemoryEntry(String position, String value) {
+        memoryTableModel.addRow(new Object[]{position, value});
+    }
+
+    public void addDiskEntry(String position, String value) {
+        diskTableModel.addRow(new Object[]{position, value});
+    }
 
     public void updateProcessState(int rowIndex, String state) {
         if (rowIndex >= 0 && rowIndex < tableModel.getRowCount()) {
@@ -302,14 +312,42 @@ public class Principal extends javax.swing.JFrame {
         }
     }
     
-    public void updateBCPTable(BCP bcp) {
-        bcpTableModel.setRowCount(0); // Limpiar tabla antes de agregar nuevos datos
-        bcpTableModel.addRow(new Object[]{"PC", bcp.getProgramCounter()});
-        bcpTableModel.addRow(new Object[]{"IR", bcp.getProcesos()});
-        bcpTableModel.addRow(new Object[]{"AC", bcp.getAccumulator()});
-        // Agrega otros registros según sea necesario
+    public void updateBCPTable(String[][] data) {
+        bcpTableModel.setRowCount(0);
+        for (String[] row : data) {
+            bcpTableModel.addRow(row);
+        }
     }
     
+    public void clearMemoryTable() {
+        memoryTableModel.setRowCount(0);
+    }
+    
+    public void clearDiskTable() {
+        diskTableModel.setRowCount(0);
+    }
+    
+    public void clearProcessTable() {
+        tableModel.setRowCount(0);
+    }
+    
+    public void clearBCPTable() {
+        bcpTableModel.setRowCount(0);
+    }
+    public JButton getExecuteButton() {
+        return Execute;
+    }
+    
+    public void highlightMemoryEntry(int position) {
+        for (int i = 0; i < memoryTable.getRowCount(); i++) {
+            String posStr = memoryTable.getValueAt(i, 0).toString();
+            if (Integer.parseInt(posStr) == position) {
+                memoryTable.setRowSelectionInterval(i, i);
+                break;
+            }
+        }
+    }
+
     /**
      * @param args the command line arguments
      */

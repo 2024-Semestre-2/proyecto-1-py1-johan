@@ -6,8 +6,8 @@ package App;
 
 import Controller.PrinController;
 import Model.LeerArchivos;
-import static Model.LeerArchivos.readAndProcessFile;
 import View.Principal;
+import java.io.IOException;
 
 import java.util.List;
 
@@ -17,14 +17,19 @@ import java.util.List;
  */
 public class App {
     public static void main(String[] args) {
-        LeerArchivos Model = new LeerArchivos();
-        String currentDir = System.getProperty("user.dir");
-        String filePath = currentDir + "\\src\\main\\java\\App\\Memoria.txt";
-        List<String> result = readAndProcessFile(filePath);
-        
-        Principal View = new Principal();
-        PrinController Controller = new PrinController(View, Model);
-
-        Controller.mostrarVista();
+            // Crear instancia del modelo LeerArchivos
+            LeerArchivos model = new LeerArchivos();
+            
+            // Obtener el directorio actual y el archivo de configuración de memoria
+            
+            
+            // Cargar la configuración de memoria y disco
+            
+            // Inicializar la vista y el controlador
+            Principal view = new Principal();
+            PrinController controller = new PrinController(view, model);
+            
+            // Mostrar la vista
+            controller.mostrarVista();
     }
 }

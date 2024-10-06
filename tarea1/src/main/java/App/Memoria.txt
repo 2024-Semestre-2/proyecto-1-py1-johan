@@ -1,2 +1,1 @@
-memoria, 512, kb
-virtual, 64, kb
+MEMORY_SIZE=512

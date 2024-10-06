@@ -1,11 +1,9 @@
 package Model;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.regex.Pattern;
-import javax.swing.*;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,23 +12,37 @@ import java.util.List;
  * @author johan
  */
 public class LeerArchivos {
-    private String filePath;
-    
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+
+    public static class ASMFileContent {
+        private List<String> instructions;
+        private String fileName;
+        
+        public ASMFileContent(String fileName, List<String> instructions) {
+            this.fileName = fileName;
+            this.instructions = instructions;
+        }
+        
+        public List<String> getInstructions() { return instructions; }
+        public String getFileName() { return fileName; }
     }
     
-    public String leerArchivo() throws IOException {
-        StringBuilder content = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+    public ASMFileContent readFile(File file) throws IOException {
+        List<String> lines = new ArrayList<>();
+        String fileName = file.getName().replaceFirst("[.][^.]+$", ""); // Elimina la extensión
+        
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
-            while ((line = br.readLine()) != null) {
-                content.append(line).append("\n");
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (!line.isEmpty()) {
+                    lines.add(line);
+                }
             }
         }
-        return content.toString();
+        
+        return new ASMFileContent(fileName, lines);
     }
-    
+    /*
     private void validarLinea(String line) throws IOException {
         Pattern movPattern = Pattern.compile("^MOV\\s+(AX|BX|CX|DX),\\s*(-?\\d+|AX|BX|CX|DX)$");
         Pattern addSubPattern = Pattern.compile("^(ADD|SUB)\\s+(AX|BX|CX|DX)$");
@@ -42,24 +54,10 @@ public class LeerArchivos {
             throw new IOException("Error en la sintaxis de la línea: " + line);
         }
     }
-    
-    public static List<String> readAndProcessFile(String filePath) {
-        List<String> resultList = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                // Dividimos la línea por comas
-                String[] values = line.split(",");
-                for (String value : values) {
-                    // Añadimos los valores con trim a la lista
-                    resultList.add(value.trim());
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error al leer el archivo: " + e.getMessage());
-        }
-
-        return resultList;
+    */
+    public boolean validateInstructions(List<String> instructions) {
+        // Aquí puedes agregar la validación de las instrucciones
+        // Por ahora retorna true, pero deberías implementar la lógica de validación
+        return true;
     }
 }
